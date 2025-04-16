@@ -1,0 +1,217 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct Node {
+    int data;
+    struct Node* next;
+};
+
+struct Node* last = NULL;
+
+struct Node* createNode(int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    return newNode;
+}
+
+int countNodes() {
+    if (last == NULL) return 0;
+    int count = 1;
+    struct Node* temp = last->next;
+    while (temp != last) {
+        count++;
+        temp = temp->next;
+    }
+    return count;
+}
+
+void insertBegin(int data) {
+    struct Node* newNode = createNode(data);
+    if (last == NULL) {
+        newNode->next = newNode;
+        last = newNode;
+    } else {
+        newNode->next = last->next;
+        last->next = newNode;
+    }
+}
+
+void insertEnd(int data) {
+    struct Node* newNode = createNode(data);
+    if (last == NULL) {
+        newNode->next = newNode;
+        last = newNode;
+    } else {
+        newNode->next = last->next;
+        last->next = newNode;
+        last = newNode;
+    }
+}
+
+void insertAtPos(int data, int pos) {
+    int n = countNodes();
+    if (pos < 1 || pos > n + 1) {
+        printf("Invalid position\n");
+        return;
+    }
+    if (pos == 1)
+        insertBegin(data);
+    else if (pos == n + 1)
+        insertEnd(data);
+    else {
+        struct Node* newNode = createNode(data);
+        struct Node* temp = last->next;
+        for (int i = 1; i < pos - 1; i++)
+            temp = temp->next;
+        newNode->next = temp->next;
+        temp->next = newNode;
+    }
+}
+
+void deleteBegin() {
+    if (last == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = last->next;
+    if (last == last->next) {
+        free(temp);
+        last = NULL;
+    } else {
+        last->next = temp->next;
+        free(temp);
+    }
+}
+
+void deleteEnd() {
+    if (last == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = last->next;
+    if (last == last->next) {
+        free(last);
+        last = NULL;
+    } else {
+        while (temp->next != last)
+            temp = temp->next;
+        temp->next = last->next;
+        free(last);
+        last = temp;
+    }
+}
+
+void deleteAtPos(int pos) {
+    int n = countNodes();
+    if (pos < 1 || pos > n) {
+        printf("Invalid position\n");
+        return;
+    }
+    if (pos == 1)
+        deleteBegin();
+    else if (pos == n)
+        deleteEnd();
+    else {
+        struct Node* temp = last->next;
+        for (int i = 1; i < pos - 1; i++)
+            temp = temp->next;
+        struct Node* del = temp->next;
+        temp->next = del->next;
+        free(del);
+    }
+}
+
+void search(int key) {
+    if (last == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = last->next;
+    int pos = 1, found = 0;
+    do {
+        if (temp->data == key) {
+            printf("Found at position %d\n", pos);
+            found = 1;
+            break;
+        }
+        temp = temp->next;
+        pos++;
+    } while (temp != last->next);
+    if (!found)
+        printf("Not found\n");
+}
+
+void displayList() {
+    if (last == NULL) {
+        printf("List is empty\n");
+        return;
+    }
+    struct Node* temp = last->next;
+    printf("List: ");
+    do {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    } while (temp != last->next);
+    printf("\n");
+}
+
+int main() {
+    int choice, data, pos;
+    while (1) {
+        printf("\n--- Circular Singly Linked List Menu ---\n");
+        printf("1. Insert at Beginning\n");
+        printf("2. Insert at End\n");
+        printf("3. Insert at Any Position\n");
+        printf("4. Delete from Beginning\n");
+        printf("5. Delete from End\n");
+        printf("6. Delete from Any Position\n");
+        printf("7. Search\n");
+        printf("8. Display\n");
+        printf("9. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &data);
+                insertBegin(data);
+                break;
+            case 2:
+                printf("Enter value: ");
+                scanf("%d", &data);
+                insertEnd(data);
+                break;
+            case 3:
+                printf("Enter value and position: ");
+                scanf("%d %d", &data, &pos);
+                insertAtPos(data, pos);
+                break;
+            case 4:
+                deleteBegin();
+                break;
+            case 5:
+                deleteEnd();
+                break;
+            case 6:
+                printf("Enter position: ");
+                scanf("%d", &pos);
+                deleteAtPos(pos);
+                break;
+            case 7:
+                printf("Enter value to search: ");
+                scanf("%d", &data);
+                search(data);
+                break;
+            case 8:
+                displayList();
+                break;
+            case 9:
+                exit(1);
+            default:
+                printf("Invalid choice\n");
+        }
+    }
+    return 0;
+}
